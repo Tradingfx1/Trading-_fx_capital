@@ -240,19 +240,20 @@ function selectPackage(amount) {
 
 }
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="module">
+import { createClient } from
+'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-<script>
-const SUPABASE_URL =  "https://krancsetehjnrwimdbju.supabase.co";
+const SUPABASE_URL = "https://krancsetehjnrwimdbju.supabase.co";
+
 const SUPABASE_KEY =  "sb_publishable_cjG-1K9PV5-kWiriZLBDKg_wumFrdOC";
 
-const supabaseClient = window.supabase.createClient(
+const supabaseClient = createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
 
+console.log("Supabase connected successfully!", supabaseClient);
+
 // Your existing website functions go below
 </script>
-
-</body>
-</html>

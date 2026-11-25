@@ -221,24 +221,6 @@ footer {
     <p>Trading involves financial risk. Returns are not guaranteed.</p>
 </footer>
 
-<script>
-
-function showPage(id) {
-
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
-
-    document.getElementById(id).classList.add('active');
-}
-
-function selectPackage(amount) {
-
-    document.getElementById('package-message').textContent =
-        "You selected the KSh " + amount +
-        " package. Payment functionality is not yet enabled.";
-
-}
 
 <script type="module">
 import { createClient } from
@@ -246,7 +228,7 @@ import { createClient } from
 
 const SUPABASE_URL = "https://krancsetehjnrwimdbju.supabase.co";
 
-const SUPABASE_KEY =  "sb_publishable_cjG-1K9PV5-kWiriZLBDKg_wumFrdOC";
+const SUPABASE_KEY = "sb_publishable_cjG-1K9PV5-kWiriZLBDKg_wumFrdOC";
 
 const supabaseClient = createClient(
     SUPABASE_URL,
@@ -255,5 +237,25 @@ const supabaseClient = createClient(
 
 console.log("Supabase connected successfully!", supabaseClient);
 
-// Your existing website functions go below
+window.supabaseClient = supabaseClient;
+
+function showPage(id) {
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+    });
+
+    document.getElementById(id).classList.add('active');
+}
+
+function selectPackage(amount) {
+    document.getElementById('package-message').textContent =
+        "You selected the KSh " + amount +
+        " package. Payment functionality is not yet enabled.";
+}
+
+window.showPage = showPage;
+window.selectPackage = selectPackage;
 </script>
+
+</body>
+</html>

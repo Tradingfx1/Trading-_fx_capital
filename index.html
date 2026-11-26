@@ -438,6 +438,40 @@ registerForm.addEventListener('submit', async function(event) {
     }
 });
 
+ // CUSTOMER DASHBOARD
+function loadCustomerDashboard(user) {
+
+    document.getElementById('customer-phone').textContent =
+        user.user_metadata.phone_number || 'Not available';
+
+    document.getElementById('customer-id').textContent =
+        user.id;
+
+    document.getElementById('customer-status').textContent =
+        'Authenticated';
+
+    document.getElementById('customer-package').textContent =
+        'Not selected';
+
+    document.getElementById('customer-balance').textContent =
+        'Not available';
+}
+
+// CUSTOMER LOGOUT
+async function logoutUser() {
+
+    const { error } = await supabaseClient.auth.signOut();
+
+    if (error) {
+        alert(error.message);
+        return;
+    }
+
+    showPage('login');
+}
+
+window.logoutUser = logoutUser;
+
 // LOGIN
 const loginForm = document.getElementById('login-form');
 
@@ -470,14 +504,11 @@ loginForm.addEventListener('submit', async function(event) {
 
 console.log('Logged in user:', data.user.id);
 
+// Load customer details
+loadCustomerDashboard(data.user);
+
 // Open customer account dashboard
 showPage('account');
-
-    } catch (error) {
-        message.textContent = error.message;
-    } finally {
-        button.disabled = false;
-    }
 });
 
 console.log('Trading FX Capital authentication initialized.');

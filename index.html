@@ -453,10 +453,12 @@ loginForm.addEventListener('submit', async function(event) {
 
         if (error) throw error;
 
-        message.textContent = 'Login successful! Welcome back.';
+       message.textContent = 'Login successful! Welcome back.';
 
-        // We will connect this to the customer dashboard next.
-        console.log('Logged in user:', data.user.id);
+console.log('Logged in user:', data.user.id);
+
+// Open customer account dashboard
+showPage('account');
 
     } catch (error) {
         message.textContent = error.message;

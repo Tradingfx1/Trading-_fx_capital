@@ -472,6 +472,7 @@ async function logoutUser() {
 
 window.logoutUser = logoutUser;
 
+
 // LOGIN
 const loginForm = document.getElementById('login-form');
 
@@ -500,9 +501,26 @@ loginForm.addEventListener('submit', async function(event) {
 
         if (error) throw error;
 
-       message.textContent = 'Login successful! Welcome back.';
+        message.textContent = 'Login successful! Welcome back.';
 
-console.log('Logged in user:', data.user.id);
+        console.log('Logged in user:', data.user.id);
+
+        // Load customer dashboard
+        await loadCustomerDashboard(data.user);
+
+        // Open customer account dashboard
+        showPage('account');
+
+    } catch (error) {
+        message.textContent = error.message;
+        console.error('Login error:', error);
+
+    } finally {
+        button.disabled = false;
+    }
+});
+
+console.log('Trading FX Capital authentication initialized.');
 
 // Load customer details
 loadCustomerDashboard(data.user);

@@ -1,4 +1,4 @@
-
+ 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -120,7 +120,7 @@ footer {
 <main>
 
 <section id="home" class="page active">
-
+ 
     <div class="card">
         <h2>Welcome to Trading FX Capital</h2>
         <p>Your financial dashboard.</p>
@@ -204,15 +204,97 @@ footer {
 
 </section>
 
+
 <section id="login" class="page">
 
     <div class="card">
         <h2>Customer Login</h2>
-        <p>Secure customer login will be connected
-        through our backend.</p>
+        <p>Welcome back to Trading FX Capital.</p>
+
+        <form id="login-form">
+
+            <label for="login-phone">Phone Number (Username)</label>
+            <input
+                type="tel"
+                id="login-phone"
+                placeholder="+2547XXXXXXXX"
+                required
+            >
+
+            <label for="login-password">Password</label>
+            <input
+                type="password"
+                id="login-password"
+                placeholder="Enter your password"
+                required
+            >
+
+            <button type="submit">Login</button>
+
+            <p id="login-message"></p>
+
+        </form>
+
+        <p>
+            Don't have an account?
+            <a href="#" onclick="showPage('register'); return false;">
+                Create Account
+            </a>
+        </p>
     </div>
 
 </section>
+
+<section id="register" class="page">
+
+    <div class="card">
+        <h2>Create Account</h2>
+        <p>Join Trading FX Capital today.</p>
+
+        <form id="register-form">
+
+            <label for="register-phone">Phone Number (Username)</label>
+            <input
+                type="tel"
+                id="register-phone"
+                placeholder="+2547XXXXXXXX"
+                required
+            >
+
+            <label for="register-password">Create Password</label>
+            <input
+                type="password"
+                id="register-password"
+                placeholder="Create a password"
+                minlength="8"
+                required
+            >
+
+            <label for="confirm-password">Confirm Password</label>
+            <input
+                type="password"
+                id="confirm-password"
+                placeholder="Enter password again"
+                minlength="8"
+                required
+            >
+
+            <button type="submit">Create Account</button>
+
+            <p id="register-message"></p>
+
+        </form>
+
+        <p>
+            Already have an account?
+            <a href="#" onclick="showPage('login'); return false;">
+                Login
+            </a>
+        </p>
+    </div>
+
+</section>
+
 
 </main>
 
@@ -222,12 +304,12 @@ footer {
 </footer>
 
 
+
 <script type="module">
 import { createClient } from
 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
 const SUPABASE_URL = "https://krancsetehjnrwimdbju.supabase.co";
-
 const SUPABASE_KEY = "sb_publishable_cjG-1K9PV5-kWiriZLBDKg_wumFrdOC";
 
 const supabaseClient = createClient(
@@ -235,10 +317,9 @@ const supabaseClient = createClient(
     SUPABASE_KEY
 );
 
-console.log("Supabase connected successfully!", supabaseClient);
-
 window.supabaseClient = supabaseClient;
 
+// PAGE NAVIGATION
 function showPage(id) {
     document.querySelectorAll('.page').forEach(page => {
         page.classList.remove('active');
@@ -247,6 +328,7 @@ function showPage(id) {
     document.getElementById(id).classList.add('active');
 }
 
+// PACKAGE SELECTION
 function selectPackage(amount) {
     document.getElementById('package-message').textContent =
         "You selected the KSh " + amount +
@@ -255,7 +337,137 @@ function selectPackage(amount) {
 
 window.showPage = showPage;
 window.selectPackage = selectPackage;
+
+// PHONE NUMBER CONVERSION
+function normalizePhone(number) {
+    let phone = number.trim().replace(/[\s()-]/g, '');
+
+    if (/^0[17]\d{8}$/.test(phone)) {
+        phone = '+254' + phone.substring(1);
+    } else if (/^254[17]\d{8}$/.test(phone)) {
+        phone = '+' + phone;
+    }
+
+    if (!/^\+254[17]\d{8}$/.test(phone)) {
+        throw new Error(
+            'Enter a valid Kenyan phone number, e.g. 0712345678.'
+        );
+    }
+
+    return phone;
+}
+
+// INTERNAL SUPABASE LOGIN IDENTIFIER
+function getLoginEmail(phone) {
+    return phone.substring(1) + '@phone.tradingfxcapital.com';
+}
+
+// REGISTRATION
+const registerForm = document.getElementById('register-form');
+
+registerForm.addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const message = document.getElementById('register-message');
+    const button = registerForm.querySelector('button');
+
+    try {
+        const phone = normalizePhone(
+            document.getElementById('register-phone').value
+        );
+
+        const password =
+            document.getElementById('register-password').value;
+
+        const confirmPassword =
+            document.getElementById('confirm-password').value;
+
+        if (password.length < 8) {
+            throw new Error('Password must have at least 8 characters.');
+        }
+
+        if (password !== confirmPassword) {
+            throw new Error('Your passwords do not match.');
+        }
+
+        button.disabled = true;
+        message.textContent = 'Creating your account...';
+
+        const { data, error } = await supabaseClient.auth.signUp({
+            email: getLoginEmail(phone),
+            password: password,
+            options: {
+                data: {
+                    phone_number: phone
+                }
+            }
+        });
+
+        if (error) throw error;
+
+        if (!data.session) {
+            message.textContent =
+                'Account created. Email confirmation is still enabled. ' +
+                'Disable it in Supabase before continuing.';
+            return;
+        }
+
+        message.textContent =
+            'Account created successfully! You can now log in.';
+
+        registerForm.reset();
+
+    } catch (error) {
+        message.textContent = error.message;
+    } finally {
+        button.disabled = false;
+    }
+});
+
+// LOGIN
+const loginForm = document.getElementById('login-form');
+
+loginForm.addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const message = document.getElementById('login-message');
+    const button = loginForm.querySelector('button');
+
+    try {
+        const phone = normalizePhone(
+            document.getElementById('login-phone').value
+        );
+
+        const password =
+            document.getElementById('login-password').value;
+
+        button.disabled = true;
+        message.textContent = 'Signing you in...';
+
+        const { data, error } =
+            await supabaseClient.auth.signInWithPassword({
+                email: getLoginEmail(phone),
+                password: password
+            });
+
+        if (error) throw error;
+
+        message.textContent = 'Login successful! Welcome back.';
+
+        // We will connect this to the customer dashboard next.
+        console.log('Logged in user:', data.user.id);
+
+    } catch (error) {
+        message.textContent = error.message;
+    } finally {
+        button.disabled = false;
+    }
+});
+
+console.log('Trading FX Capital authentication initialized.');
+
 </script>
+
 
 </body>
 </html>

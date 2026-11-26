@@ -460,13 +460,19 @@ registerForm.addEventListener('submit', async function(event) {
 });
 
  // CUSTOMER DASHBOARD
+
 function loadCustomerDashboard(user) {
 
+    if (!user) {
+        console.error('No authenticated user found.');
+        return;
+    }
+
     document.getElementById('customer-phone').textContent =
-        user.user_metadata.phone_number || 'Not available';
+        user.user_metadata?.phone_number || 'Not available';
 
     document.getElementById('customer-id').textContent =
-        user.id;
+        user.id || 'Not available';
 
     document.getElementById('customer-status').textContent =
         'Authenticated';
@@ -477,7 +483,6 @@ function loadCustomerDashboard(user) {
     document.getElementById('customer-balance').textContent =
         'Not available';
 }
-
 // CUSTOMER LOGOUT
 async function logoutUser() {
 
